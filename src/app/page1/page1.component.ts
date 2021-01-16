@@ -1,5 +1,5 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {DataService} from '../data.service';
+import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
+import {DataService, DataServiceInterface} from '../data.service';
 import {Book} from '../model/Book';
 import {Subscription} from 'rxjs';
 
@@ -15,8 +15,9 @@ export class Page1Component implements OnInit, OnDestroy {
   numberOfBooksWrittenByMisty: number;
 
   subscription: Subscription;
+  subscription2: Subscription;
 
-  constructor(public dataService: DataService) {
+  constructor(@Inject('DataServiceInterface') private dataService: DataServiceInterface) {
   }
 
   ngOnInit(): void {
@@ -39,10 +40,17 @@ export class Page1Component implements OnInit, OnDestroy {
       }
     );
 
+    this.subscription2 = this.dataService.bookDeletedEvent.subscribe((book) => {
+      if (book.author === 'Misty') {
+        this.numberOfBooksWrittenByMisty--;
+      }
+    });
+
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.subscription2.unsubscribe();
   }
 
   onButtonClick(): void {
